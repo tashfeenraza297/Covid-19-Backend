@@ -1,7 +1,7 @@
 fastapi==0.118.0
 uvicorn==0.30.0
 gunicorn==23.0.0
-numpy==1.26.4
-pillow==11.0.0
+numpy==1.24.4  # Compatible with TF 2.11 and Python 3.10
+pillow==10.0.1  # Downgraded for stability
 python-multipart==0.0.20
-tensorflow-cpu==2.11.0
+tensorflow-cpu==2.11.0  # Now compatible with Python 3.10

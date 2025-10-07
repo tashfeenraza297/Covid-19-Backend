@@ -19,10 +19,9 @@ app.add_middleware(
 )
 
 # Load the pre-trained models
-model_resnet = tf.keras.models.load_model('../Models/model_resnet50.h5')
-model_vgg = tf.keras.models.load_model('../Models/model_vgg16.h5')
-model_xception = tf.keras.models.load_model('../Models/model_xception.h5')
-
+model_resnet = tf.keras.models.load_model('./Models/model_resnet50.h5')
+model_vgg = tf.keras.models.load_model('./Models/model_vgg16.h5')
+model_xception = tf.keras.models.load_model('./Models/model_xception.h5')
 @app.get("/")
 def read_root():
     return {"message": "Welcome to COVID-19 Detection API! Use /predict for inference."}

@@ -9,7 +9,6 @@ from utils import preprocess_image
 
 app = FastAPI(title="COVID-19 Detection API")
 
-# Add CORS middleware to allow frontend[](http://localhost:3000) to connect
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -18,13 +17,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load the pre-trained models
-model_resnet = tf.keras.models.load_model('./Models/model_resnet50.h5')
-model_vgg = tf.keras.models.load_model('./Models/model_vgg16.h5')
-model_xception = tf.keras.models.load_model('./Models/model_xception.h5')
+# Load models with custom configuration to handle batch_shape
+model_resnet = tf.keras.models.load_model('./Models/model_resnet50.h5', compile=False)
+model_vgg = tf.keras.models.load_model('./Models/model_vgg16.h5', compile=False)
+model_xception = tf.keras.models.load_model('./Models/model_xception.h5', compile=False)
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to COVID-19 Detection API! Use /predict for inference."}
+
+@app.get("/healthz")
+def health_check():
+    return {"status": "healthy"}
 
 @app.post("/predict")
 async def predict(files: list[UploadFile] = File(...)):

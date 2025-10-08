@@ -17,10 +17,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load models with custom configuration to handle batch_shape
-model_resnet = tf.keras.models.load_model('./Models/model_resnet50.h5', compile=False)
-model_vgg = tf.keras.models.load_model('./Models/model_vgg16.h5', compile=False)
-model_xception = tf.keras.models.load_model('./Models/model_xception.h5', compile=False)
+# Custom object to handle batch_shape
+def custom_input_layer(*args, **kwargs):
+    if 'batch_shape' in kwargs:
+        kwargs['batch_input_shape'] = kwargs.pop('batch_shape')
+    from tensorflow.keras.layers import InputLayer
+    return InputLayer(*args, **kwargs)
+
+# Load models with custom objects to handle batch_shape
+model_resnet = tf.keras.models.load_model(
+    './Models/model_resnet50.h5',
+    custom_objects={'InputLayer': custom_input_layer},
+    compile=False
+)
+model_vgg = tf.keras.models.load_model(
+    './Models/model_vgg16.h5',
+    custom_objects={'InputLayer': custom_input_layer},
+    compile=False
+)
+model_xception = tf.keras.models.load_model(
+    './Models/model_xception.h5',
+    custom_objects={'InputLayer': custom_input_layer},
+    compile=False
+)
 
 @app.get("/")
 def read_root():

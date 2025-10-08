@@ -6,6 +6,8 @@ import numpy as np
 from PIL import Image
 import io
 from utils import preprocess_image
+from tensorflow.keras import mixed_precision
+from tensorflow.keras.utils import custom_object_scope
 
 app = FastAPI(title="COVID-19 Detection API")
 
@@ -17,29 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Custom object to handle batch_shape
-def custom_input_layer(*args, **kwargs):
-    if 'batch_shape' in kwargs:
-        kwargs['batch_input_shape'] = kwargs.pop('batch_shape')
-    from tensorflow.keras.layers import InputLayer
-    return InputLayer(*args, **kwargs)
-
-# Load models with custom objects to handle batch_shape
-model_resnet = tf.keras.models.load_model(
-    './Models/model_resnet50.h5',
-    custom_objects={'InputLayer': custom_input_layer},
-    compile=False
-)
-model_vgg = tf.keras.models.load_model(
-    './Models/model_vgg16.h5',
-    custom_objects={'InputLayer': custom_input_layer},
-    compile=False
-)
-model_xception = tf.keras.models.load_model(
-    './Models/model_xception.h5',
-    custom_objects={'InputLayer': custom_input_layer},
-    compile=False
-)
+# Define custom scope to handle DTypePolicy
+with custom_object_scope({'DTypePolicy': mixed_precision.Policy}):
+    model_resnet = tf.keras.models.load_model('./Models/model_resnet50.h5', compile=False)
+    model_vgg = tf.keras.models.load_model('./Models/model_vgg16.h5', compile=False)
+    model_xception = tf.keras.models.load_model('./Models/model_xception.h5', compile=False)
 
 @app.get("/")
 def read_root():

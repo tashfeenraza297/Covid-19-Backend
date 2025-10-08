@@ -6,8 +6,6 @@ import numpy as np
 from PIL import Image
 import io
 from utils import preprocess_image
-from tensorflow.keras import mixed_precision
-from tensorflow.keras.utils import custom_object_scope
 
 app = FastAPI(title="COVID-19 Detection API")
 
@@ -19,11 +17,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define custom scope to handle DTypePolicy
-with custom_object_scope({'DTypePolicy': mixed_precision.Policy}):
-    model_resnet = tf.keras.models.load_model('./Models/model_resnet50.h5', compile=False)
-    model_vgg = tf.keras.models.load_model('./Models/model_vgg16.h5', compile=False)
-    model_xception = tf.keras.models.load_model('./Models/model_xception.h5', compile=False)
+# Load the resaved models
+model_resnet = tf.keras.models.load_model('./Models/model_resnet50_fixed.h5', compile=False)
+model_vgg = tf.keras.models.load_model('./Models/model_vgg16_fixed.h5', compile=False)
+model_xception = tf.keras.models.load_model('./Models/model_xception_fixed.h5', compile=False)
 
 @app.get("/")
 def read_root():
